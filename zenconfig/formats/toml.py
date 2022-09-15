@@ -5,7 +5,7 @@ from typing import Any
 import tomli
 import tomli_w
 
-from zenconfig.write import Format
+from zenconfig.formats.abc import Format
 
 
 @dataclass

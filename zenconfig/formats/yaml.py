@@ -4,7 +4,7 @@ from typing import Any
 
 import yaml
 
-from zenconfig.write import Format
+from zenconfig.formats.abc import Format
 
 
 @dataclass

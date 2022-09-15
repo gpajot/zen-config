@@ -5,26 +5,27 @@ import pytest
 from zenconfig.formats.json import JSONFormat
 from zenconfig.formats.toml import TOMLFormat
 from zenconfig.formats.yaml import YAMLFormat
-from zenconfig.schemas.dict import DictSchema
 from zenconfig.write import Config
 
 
 class BaseConfig(Config, dict):
-    PATH: ClassVar[str] = "test_config_file"
-    SCHEMA: ClassVar[DictSchema] = DictSchema()
+    ...
 
 
 @pytest.mark.parametrize(
-    "fmt",
+    ("fmt", "ext"),
     [
-        JSONFormat(),
-        TOMLFormat(),
-        YAMLFormat(),
+        (JSONFormat, ".json"),
+        (TOMLFormat, ".toml"),
+        (YAMLFormat, ".yaml"),
     ],
 )
-def test_all_formats(fmt):
+def test_all_formats(fmt, ext):
     class FmtConfig(BaseConfig):
-        FORMAT = fmt
+        PATH: ClassVar[str] = f"test_config_file{ext}"
+
+    # Check format inference works.
+    assert isinstance(FmtConfig._format(), fmt)
 
     cfg = FmtConfig(a="a", b=1)
     cfg.save()

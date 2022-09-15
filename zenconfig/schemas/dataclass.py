@@ -1,7 +1,7 @@
 from dataclasses import asdict, fields, is_dataclass
 from typing import Any, Type, TypeVar
 
-from zenconfig.write import Schema
+from zenconfig.schemas.abc import Schema
 
 C = TypeVar("C")
 

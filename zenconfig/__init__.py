@@ -1,15 +1,7 @@
-from typing import ClassVar
-
+from zenconfig.formats.abc import Format
 from zenconfig.formats.json import JSONFormat
-from zenconfig.read import ReadOnlyConfig, ReadOnlyFormat, ReadOnlySchema
+from zenconfig.read import ReadOnlyConfig
+from zenconfig.schemas.abc import Schema
 from zenconfig.schemas.dataclass import DataclassSchema
-from zenconfig.write import Config, Format, Schema
-
-
-class DefaultReadOnlyConfig(Config):
-    FORMAT: ClassVar[Format] = JSONFormat()
-    SCHEMA: ClassVar[Schema] = DataclassSchema()
-
-
-class DefaultConfig(DefaultReadOnlyConfig):
-    ...
+from zenconfig.schemas.dict import DictSchema
+from zenconfig.write import Config

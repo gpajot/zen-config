@@ -1,25 +1,14 @@
+import contextlib
 import os
-from abc import ABC, abstractmethod
+from abc import ABC
+from dataclasses import is_dataclass
 from pathlib import Path
-from typing import Any, ClassVar, Generic, Type, TypeVar
+from typing import ClassVar, Type, TypeVar
 
+from zenconfig.formats.abc import Format
+from zenconfig.schemas.abc import Schema
 
-class ReadOnlyFormat(ABC):
-    @abstractmethod
-    def load(self, path: Path) -> dict[str, Any]:
-        """Load the configuration file into a dict."""
-
-
-C = TypeVar("C")
-
-
-class ReadOnlySchema(ABC, Generic[C]):
-    @abstractmethod
-    def from_dict(self, cls: Type[C], cfg: dict[str, Any]) -> C:
-        """Load the schema based on a dict configuration."""
-
-
-CC = TypeVar("CC", bound="ReadOnlyConfig")
+C = TypeVar("C", bound="ReadOnlyConfig")
 
 
 class ReadOnlyConfig(ABC):
@@ -27,11 +16,11 @@ class ReadOnlyConfig(ABC):
     PATH: ClassVar[str | None] = None
     _PATH: ClassVar[Path | None] = None
 
-    FORMAT: ClassVar[ReadOnlyFormat]
-    SCHEMA: ClassVar[ReadOnlySchema]
+    FORMAT: ClassVar[Format | None] = None
+    SCHEMA: ClassVar[Schema | None] = None
 
     @classmethod
-    def path(cls) -> Path:
+    def _path(cls) -> Path:
         if not cls._PATH:
             found_path: str | None = None
             if cls.ENV_PATH:
@@ -40,9 +29,51 @@ class ReadOnlyConfig(ABC):
                 found_path = cls.PATH
             if not found_path:
                 raise ValueError("could not find the config path")
-            cls._PATH = Path(found_path)
+            cls._PATH = Path(found_path).expanduser()
         return cls._PATH
 
     @classmethod
-    def load(cls: Type[CC]) -> CC:
-        return cls.SCHEMA.from_dict(cls, cls.FORMAT.load(cls.path()))
+    def _format(cls) -> Format:
+        if cls.FORMAT:
+            return cls.FORMAT
+        suffix = cls._path().suffix
+        if suffix == ".json":
+            from zenconfig.formats.json import JSONFormat
+
+            return JSONFormat()
+        if suffix in {".yml", ".yaml"}:
+            with contextlib.suppress(ImportError):
+                from zenconfig.formats.yaml import YAMLFormat
+
+                return YAMLFormat()
+        if suffix == ".toml":
+            with contextlib.suppress(ImportError):
+                from zenconfig.formats.toml import TOMLFormat
+
+                return TOMLFormat()
+        raise ValueError(f"unsupported config file extension: {suffix}")
+
+    @classmethod
+    def _schema(cls) -> Schema:
+        if cls.SCHEMA:
+            return cls.SCHEMA
+        if is_dataclass(cls):
+            from zenconfig.schemas.dataclass import DataclassSchema
+
+            return DataclassSchema()
+        if issubclass(cls, dict):
+            from zenconfig.schemas.dict import DictSchema
+
+            return DictSchema()
+        with contextlib.suppress(ImportError):
+            from pydantic import BaseModel
+
+            if issubclass(cls, BaseModel):
+                from zenconfig.schemas.pydantic import PydanticSchema
+
+                return PydanticSchema()
+        raise ValueError("could not infer config schema")
+
+    @classmethod
+    def load(cls: Type[C]) -> C:
+        return cls._schema().from_dict(cls, cls._format().load(cls._path()))

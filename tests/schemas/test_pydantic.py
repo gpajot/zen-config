@@ -2,7 +2,6 @@ from typing import ClassVar
 
 from pydantic import BaseModel
 
-from zenconfig.formats.json import JSONFormat
 from zenconfig.schemas.pydantic import PydanticSchema
 from zenconfig.write import Config
 
@@ -18,8 +17,6 @@ class DeepPydanticConfig(BaseModel):
 
 class PydanticConfig(Config, BaseModel):
     PATH: ClassVar[str] = "test.json"
-    FORMAT: ClassVar[JSONFormat] = JSONFormat()
-    SCHEMA: ClassVar[PydanticSchema] = PydanticSchema()
 
     a: str
     b: int
@@ -27,6 +24,7 @@ class PydanticConfig(Config, BaseModel):
 
 
 def test_pydantic():
+    assert isinstance(PydanticConfig._schema(), PydanticSchema)
     cfg = PydanticConfig(
         a="a",
         b=1,

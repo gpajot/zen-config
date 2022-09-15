@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from typing import ClassVar
 
-from zenconfig.formats.json import JSONFormat
 from zenconfig.schemas.dataclass import DataclassSchema
 from zenconfig.write import Config
 
@@ -20,8 +19,6 @@ class DeepConfig:
 @dataclass
 class DataclassConfig(Config):
     PATH: ClassVar[str] = "test.json"
-    FORMAT: ClassVar[JSONFormat] = JSONFormat()
-    SCHEMA: ClassVar[DataclassSchema] = DataclassSchema()
 
     a: str
     b: int
@@ -29,6 +26,7 @@ class DataclassConfig(Config):
 
 
 def test_dataclass():
+    assert isinstance(DataclassConfig._schema(), DataclassSchema)
     cfg = DataclassConfig(
         a="a",
         b=1,

@@ -3,12 +3,7 @@ from typing import Any, Type, TypeVar
 
 from pydantic import BaseModel
 
-from zenconfig.write import Config, Schema
-
-
-class _PydanticConfig(Config, BaseModel):
-    ...
-
+from zenconfig.schemas.abc import Schema
 
 C = TypeVar("C", bound=BaseModel)
 
