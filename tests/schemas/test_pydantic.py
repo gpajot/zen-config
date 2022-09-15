@@ -2,9 +2,9 @@ from typing import ClassVar
 
 from pydantic import BaseModel
 
-from zenconfig import Config, Loc
 from zenconfig.formats.json import JSONFormat
 from zenconfig.schemas.pydantic import PydanticSchema
+from zenconfig.write import Config
 
 
 class DeeperPydanticConfig(BaseModel):
@@ -17,7 +17,7 @@ class DeepPydanticConfig(BaseModel):
 
 
 class PydanticConfig(Config, BaseModel):
-    LOC: ClassVar[Loc] = Loc(default="./test.json")
+    PATH: ClassVar[str] = "test.json"
     FORMAT: ClassVar[JSONFormat] = JSONFormat()
     SCHEMA: ClassVar[PydanticSchema] = PydanticSchema()
 

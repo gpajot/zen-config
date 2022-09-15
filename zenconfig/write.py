@@ -28,10 +28,10 @@ class Config(ReadOnlyConfig, ABC):
 
     def save(self) -> None:
         """Save the current config to the file."""
-        if not self.LOC.path.exists():
-            self.LOC.path.touch(mode=self.FILE_MODE)
-        self.FORMAT.dump(self.LOC.path, self.SCHEMA.to_dict(self))
+        if not self.path().exists():
+            self.path().touch(mode=self.FILE_MODE)
+        self.FORMAT.dump(self.path(), self.SCHEMA.to_dict(self))
 
     def clear(self) -> None:
         """Remove the config file."""
-        self.LOC.path.unlink(missing_ok=True)
+        self.path().unlink(missing_ok=True)

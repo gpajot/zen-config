@@ -6,14 +6,13 @@ import pytest
 from zenconfig.formats.json import JSONFormat
 from zenconfig.formats.toml import TOMLFormat
 from zenconfig.formats.yaml import YAMLFormat
-from zenconfig.loc import Loc
 from zenconfig.schemas.dataclass import DataclassSchema
 from zenconfig.write import Config
 
 
 @dataclass
 class BaseConfig(Config):
-    LOC: ClassVar[Loc] = Loc(default="./test_config_file")
+    PATH: ClassVar[str] = "test_config_file"
     SCHEMA: ClassVar[DataclassSchema] = DataclassSchema()
 
     a: str

@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 from typing import ClassVar
 
-from zenconfig import Config, Loc
 from zenconfig.formats.json import JSONFormat
 from zenconfig.schemas.dataclass import DataclassSchema
+from zenconfig.write import Config
 
 
 @dataclass
@@ -19,7 +19,7 @@ class DeepConfig:
 
 @dataclass
 class DataclassConfig(Config):
-    LOC: ClassVar[Loc] = Loc(default="./test.json")
+    PATH: ClassVar[str] = "test.json"
     FORMAT: ClassVar[JSONFormat] = JSONFormat()
     SCHEMA: ClassVar[DataclassSchema] = DataclassSchema()
 
