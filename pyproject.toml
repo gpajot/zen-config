@@ -30,8 +30,7 @@ build-backend = "poetry.core.masonry.api"
 profile = "black"
 
 [tool.mypy]
-package = "zenconfig"
-ignore_missing_import = true
+ignore_missing_imports = true
 install_types = true
 non_interactive = true
 
