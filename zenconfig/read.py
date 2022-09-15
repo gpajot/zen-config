@@ -28,7 +28,9 @@ class ReadOnlyConfig(ABC):
             if not found_path:
                 found_path = cls.PATH
             if not found_path:
-                raise ValueError("could not find the config path")
+                raise ValueError(
+                    f"could not find the config path for config {cls.__qualname__}"
+                )
             cls._PATH = Path(found_path).expanduser()
         return cls._PATH
 
@@ -51,7 +53,9 @@ class ReadOnlyConfig(ABC):
                 from zenconfig.formats.toml import TOMLFormat
 
                 return TOMLFormat()
-        raise ValueError(f"unsupported config file extension: {suffix}")
+        raise ValueError(
+            f"unsupported config file extension {suffix} for config {cls.__qualname__}, maybe you should require an extra"
+        )
 
     @classmethod
     def _schema(cls) -> Schema:
@@ -72,7 +76,9 @@ class ReadOnlyConfig(ABC):
                 from zenconfig.schemas.pydantic import PydanticSchema
 
                 return PydanticSchema()
-        raise ValueError("could not infer config schema")
+        raise ValueError(
+            f"could not infer config schema for config {cls.__qualname__}, maybe you should require an extra"
+        )
 
     @classmethod
     def load(cls: Type[C]) -> C:
