@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Any, ClassVar
+from typing import Any, ClassVar, TypeVar
 
 from zenconfig.read import ReadOnlyConfig, ReadOnlyFormat, ReadOnlySchema
 
@@ -11,7 +11,10 @@ class Format(ReadOnlyFormat, ABC):
         """Dump in the configuration file."""
 
 
-class Schema(ReadOnlySchema, ABC):
+C = TypeVar("C")
+
+
+class Schema(ReadOnlySchema[C], ABC):
     @abstractmethod
     def to_dict(self, config: Any) -> dict[str, Any]:
         """Dump the config to dict."""

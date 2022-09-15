@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Any, ClassVar, Type, TypeVar
+from typing import Any, ClassVar, Generic, Type, TypeVar
 
 from zenconfig.loc import Loc
 
@@ -14,7 +14,7 @@ class ReadOnlyFormat(ABC):
 C = TypeVar("C")
 
 
-class ReadOnlySchema(ABC):
+class ReadOnlySchema(ABC, Generic[C]):
     @abstractmethod
     def from_dict(self, cls: Type[C], cfg: dict[str, Any]) -> C:
         """Load the schema based on a dict configuration."""
