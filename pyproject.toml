@@ -11,11 +11,19 @@ python = ">=3.9,<3.11"
 
 PyYAML = { version = "^6", optional = true }
 
+tomli = { version = "^2", optional = true }
+tomli-w = { version = "^1", optional = true }
+
+pydantic = { version = "^1", optional = true }
+
 [tool.poetry.extras]
 yaml = ["PyYAML"]
+toml = ["tomli", "tomli-w"]
+pydantic = ["pydantic"]
 
 [tool.poetry.group.test.dependencies]
 pytest = "^7"
+pytest-mock = "^3"
 flake8 = "^5"
 mypy = "~0"
 black = "^22"
