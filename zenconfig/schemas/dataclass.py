@@ -1,5 +1,5 @@
 from dataclasses import asdict, fields, is_dataclass
-from typing import Any, Type, TypeVar
+from typing import Any, Dict, Type, TypeVar
 
 from zenconfig.schemas.abc import Schema
 
@@ -7,11 +7,11 @@ C = TypeVar("C")
 
 
 class DataclassSchema(Schema[C]):
-    def from_dict(self, cls: Type[C], cfg: dict[str, Any]) -> C:
+    def from_dict(self, cls: Type[C], cfg: Dict[str, Any]) -> C:
         return _load_nested(cls, cfg)
 
-    def to_dict(self, config: C) -> dict[str, Any]:
-        cfg: dict[str, Any] = {}
+    def to_dict(self, config: C) -> Dict[str, Any]:
+        cfg: Dict[str, Any] = {}
         for field in fields(config):
             value = getattr(config, field.name)
             if is_dataclass(field.type):
@@ -20,9 +20,9 @@ class DataclassSchema(Schema[C]):
         return cfg
 
 
-def _load_nested(cls: Type[C], cfg: dict[str, Any]) -> C:
+def _load_nested(cls: Type[C], cfg: Dict[str, Any]) -> C:
     """Load nested dataclasses."""
-    kwargs: dict[str, Any] = {}
+    kwargs: Dict[str, Any] = {}
     for field in fields(cls):
         if field.name not in cfg:
             continue

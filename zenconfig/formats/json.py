@@ -1,7 +1,7 @@
 import json
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, Dict
 
 from zenconfig.formats.abc import Format
 
@@ -12,10 +12,10 @@ class JSONFormat(Format):
     sort_keys: bool = True
     ensure_ascii: bool = False
 
-    def load(self, path: Path) -> dict[str, Any]:
+    def load(self, path: Path) -> Dict[str, Any]:
         return json.loads(path.read_text())
 
-    def dump(self, path: Path, config: dict[str, Any]) -> None:
+    def dump(self, path: Path, config: Dict[str, Any]) -> None:
         path.write_text(
             json.dumps(
                 config,
