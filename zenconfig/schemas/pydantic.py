@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any, Type, TypeVar
+from typing import Any, Dict, Type, TypeVar
 
 from pydantic import BaseModel
 
@@ -13,10 +13,11 @@ class PydanticSchema(Schema[BaseModel]):
     exclude_unset: bool = False
     exclude_defaults: bool = True
 
-    def from_dict(self, cls: Type[C], cfg: dict[str, Any]) -> C:
+    def from_dict(self, cls: Type[C], cfg: Dict[str, Any]) -> C:
         return cls.parse_obj(cfg)
 
-    def to_dict(self, config: C) -> dict[str, Any]:
+    def to_dict(self, config: C) -> Dict[str, Any]:
         return config.dict(
-            exclude_unset=self.exclude_unset, exclude_defaults=self.exclude_defaults
+            exclude_unset=self.exclude_unset,
+            exclude_defaults=self.exclude_defaults,
         )

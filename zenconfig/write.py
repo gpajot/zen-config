@@ -1,5 +1,6 @@
+import sys
 from abc import ABC
-from typing import ClassVar
+from typing import ClassVar, Dict
 
 from zenconfig.read import ReadOnlyConfig
 
@@ -15,4 +16,7 @@ class Config(ReadOnlyConfig, ABC):
 
     def clear(self) -> None:
         """Remove the config file."""
-        self._path().unlink(missing_ok=True)
+        kwargs: Dict[str, bool] = {}
+        if sys.version_info[:2] != (3, 7):
+            kwargs["missing_ok"] = True
+        self._path().unlink(**kwargs)

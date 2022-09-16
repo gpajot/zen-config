@@ -3,7 +3,7 @@ import os
 from abc import ABC
 from dataclasses import is_dataclass
 from pathlib import Path
-from typing import ClassVar, Type, TypeVar
+from typing import ClassVar, Type, TypeVar, Union
 
 from zenconfig.formats.abc import Format
 from zenconfig.schemas.abc import Schema
@@ -12,17 +12,17 @@ C = TypeVar("C", bound="ReadOnlyConfig")
 
 
 class ReadOnlyConfig(ABC):
-    ENV_PATH: ClassVar[str | None] = None
-    PATH: ClassVar[str | None] = None
-    _PATH: ClassVar[Path | None] = None
+    ENV_PATH: ClassVar[Union[str, None]] = None
+    PATH: ClassVar[Union[str, None]] = None
+    _PATH: ClassVar[Union[Path, None]] = None
 
-    FORMAT: ClassVar[Format | None] = None
-    SCHEMA: ClassVar[Schema | None] = None
+    FORMAT: ClassVar[Union[Format, None]] = None
+    SCHEMA: ClassVar[Union[Schema, None]] = None
 
     @classmethod
     def _path(cls) -> Path:
         if not cls._PATH:
-            found_path: str | None = None
+            found_path: Union[str, None] = None
             if cls.ENV_PATH:
                 found_path = os.environ.get(cls.ENV_PATH)
             if not found_path:
