@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 
 from zenconfig.formats.abc import Format
@@ -23,7 +25,7 @@ class TestReadOnlyConfig:
         return Config
 
     def test_should_be_able_to_load_from_file(self, fmt, schema, config):
-        config.PATH = "test.json"
+        config._PATH = Path("test.json")
         fmt.load.side_effect = lambda p: {"a": str(p)}
         schema.from_dict.side_effect = lambda c, o: (c, o)
 
