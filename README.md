@@ -36,7 +36,7 @@ When creating your config, you can specify at least one of those two attributes:
 
 > 💡 When supplying both, if the env var is not set, it will use `PATH`.
 
-The only transformation on the path made is to expand user constructs.
+User constructs will be expanded.
 If the file does not exist it will be created (not parent directories though).
 You can specify the file mode via `Config.FILE_MODE`.
 
@@ -52,6 +52,15 @@ Currently, those formats are supported:
 The format is automatically inferred from the config file extension.
 You can still specify it manually using `Config.FORMAT`, for custom ones or configuring dump options.
 Other formats can be added by subclassing either `Format` or `ReadOnlyFormat`.
+
+To support more formats:
+```python
+from zenconfig import Config
+
+Config.FORMATS.append(MyFormat)
+# or
+Config.FORMATS = [MyFormat]
+```
 
 ## Supported schemas
 Currently, those schemas are supported:
@@ -76,3 +85,11 @@ class MyPydanticConfig(Config, BaseModel):
 > to all class variable you override
 > otherwise pydantic will treat those as its own fields and complain.
 
+To support more schemas:
+```python
+from zenconfig import Config
+
+Config.SCHEMAS.append(MySchema)
+# or
+Config.SCHEMAS = [MySchema]
+```
