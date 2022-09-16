@@ -1,5 +1,11 @@
-# simple-config
+# zen-config
+
+[![Tests Status](https://github.com/gpajot/zen-config/workflows/Test/badge.svg?branch=main&event=push)](https://github.com/gpajot/zen-config/actions?query=workflow%3ATest+branch%3Amain+event%3Apush)
+[![Stable Version](https://img.shields.io/pypi/v/zenconfig?label=stable)](https://pypi.org/project/zenconfig/)
+
 Simple configuration loader for python.
+
+It requires python 3.7+.
 
 Compared to other solutions, the goal is to bring:
 - simple usage for simple use cases
@@ -93,3 +99,6 @@ Config.SCHEMAS.append(MySchema)
 # or
 Config.SCHEMAS = [MySchema]
 ```
+
+## Contributing
+See [contributing guide](https://github.com/gpajot/zen-config/blob/main/CONTRIBUTING.md).
