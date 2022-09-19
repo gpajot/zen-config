@@ -1,12 +1,40 @@
 import os
-from abc import ABC
+from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import ClassVar, List, Union
+from typing import Any, ClassVar, Dict, Generic, List, Type, TypeVar, Union
 
-from zenconfig.formats.abc import Format
-from zenconfig.formats.selectors import FormatSelector, format_selectors
-from zenconfig.schemas.abc import Schema
-from zenconfig.schemas.selectors import SchemaSelector, schema_selectors
+
+class Format(ABC):
+    @classmethod
+    @abstractmethod
+    def handles(cls, path: Path) -> bool:
+        """Return whether the format handles the extension."""
+
+    @abstractmethod
+    def load(self, path: Path) -> Dict[str, Any]:
+        """Load the configuration file into a dict."""
+
+    @abstractmethod
+    def dump(self, path: Path, config: Dict[str, Any]) -> None:
+        """Dump in the configuration file."""
+
+
+C = TypeVar("C")
+
+
+class Schema(ABC, Generic[C]):
+    @classmethod
+    @abstractmethod
+    def handles(cls, config_class: type) -> bool:
+        """Return whether the schema handles the config."""
+
+    @abstractmethod
+    def from_dict(self, cls: Type[C], cfg: Dict[str, Any]) -> C:
+        """Load the schema based on a dict configuration."""
+
+    @abstractmethod
+    def to_dict(self, config: Any) -> Dict[str, Any]:
+        """Dump the config to dict."""
 
 
 class BaseConfig(ABC):
@@ -14,11 +42,19 @@ class BaseConfig(ABC):
     PATH: ClassVar[Union[str, None]] = None
     _PATH: ClassVar[Union[Path, None]] = None
 
-    FORMATS: ClassVar[List[FormatSelector]] = format_selectors
+    FORMATS: ClassVar[List[Type[Format]]] = []
     FORMAT: ClassVar[Union[Format, None]] = None
 
-    SCHEMAS: ClassVar[List[SchemaSelector]] = schema_selectors
+    SCHEMAS: ClassVar[List[Type[Schema]]] = []
     SCHEMA: ClassVar[Union[Schema, None]] = None
+
+    @classmethod
+    def register_format(cls, format_class: Type[Format]) -> None:
+        cls.FORMATS.append(format_class)
+
+    @classmethod
+    def register_schema(cls, schema_class: Type[Schema]) -> None:
+        cls.SCHEMAS.append(schema_class)
 
     @classmethod
     def _path(cls) -> Path:
@@ -41,24 +77,25 @@ class BaseConfig(ABC):
         if cls.FORMAT:
             return cls.FORMAT
         ext = cls._path().suffix
-        for selector in cls.FORMATS:
-            fmt = selector(ext)
-            if fmt:
-                cls.FORMAT = fmt
-                return fmt
+        path = cls._path()
+        for format_class in cls.FORMATS:
+            if not format_class.handles(path):
+                continue
+            cls.FORMAT = format_class()
+            return cls.FORMAT
         raise ValueError(
-            f"unsupported config file extension {ext} for config {cls.__qualname__}"
+            f"unsupported config file extension {ext} for config {cls.__qualname__}, maybe you are missing an extra"
         )
 
     @classmethod
     def _schema(cls) -> Schema:
         if cls.SCHEMA:
             return cls.SCHEMA
-        for selector in cls.SCHEMAS:
-            schema = selector(cls)
-            if schema:
-                cls.SCHEMA = schema
-                return schema
+        for schema_class in cls.SCHEMAS:
+            if not schema_class.handles(cls):
+                continue
+            cls.SCHEMA = schema_class()
+            return cls.SCHEMA
         raise ValueError(
             f"could not infer config schema for config {cls.__qualname__}, maybe you are missing an extra"
         )

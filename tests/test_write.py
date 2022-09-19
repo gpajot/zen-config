@@ -2,8 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from zenconfig.formats.abc import Format
-from zenconfig.schemas.abc import Schema
+from zenconfig.base import Format, Schema
 from zenconfig.write import Config
 
 

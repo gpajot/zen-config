@@ -56,17 +56,12 @@ Currently, those formats are supported:
 - TOML - requires the `toml` extra
 
 The format is automatically inferred from the config file extension.
-You can still specify it manually using `Config.FORMAT`, for custom ones or configuring dump options.
-Other formats can be added by subclassing either `Format` or `ReadOnlyFormat`.
 
-To support more formats:
-```python
-from zenconfig import Config
+Other formats can be added by subclassing `Format`.
 
-Config.FORMATS.append(MyFormat)
-# or
-Config.FORMATS = [MyFormat]
-```
+To register more formats: `Config.register_format(MyFormat)`.
+
+You can also force the format using `Config.FORMAT = MyFormat(...)`. This can be used to disable auto selection, or pass parameters to the format. 
 
 ## Supported schemas
 Currently, those schemas are supported:
@@ -75,8 +70,13 @@ Currently, those schemas are supported:
 - pydantic models - requires the `pydantic` extra
 
 
-The format is automatically inferred from the config class.
-You can still specify it manually using `Config.SCHEMA`, for custom ones or configuring dump options.
+The schema is automatically inferred from the config class.
+
+Other schemas can be added by subclassing `Schema`.
+
+To register more schemas: `Config.register_schema(MySchema)`.
+
+You can also force the schema using `Config.SCHEMA = MySchema(...)`. This can be used to disable auto selection, or pass parameters to the schema.
 
 To use pydantic:
 ```python
@@ -90,15 +90,6 @@ class MyPydanticConfig(Config, BaseModel):
 > ⚠️ When using pydantic, you have to supply the `ClassVar` type annotations
 > to all class variable you override
 > otherwise pydantic will treat those as its own fields and complain.
-
-To support more schemas:
-```python
-from zenconfig import Config
-
-Config.SCHEMAS.append(MySchema)
-# or
-Config.SCHEMAS = [MySchema]
-```
 
 ## Contributing
 See [contributing guide](https://github.com/gpajot/zen-config/blob/main/CONTRIBUTING.md).

@@ -4,13 +4,17 @@ from typing import Any, Dict
 
 import yaml
 
-from zenconfig.formats.abc import Format
+from zenconfig.base import BaseConfig, Format
 
 
 @dataclass
 class YAMLFormat(Format):
     indent: int = 2
     sort_keys: bool = True
+
+    @classmethod
+    def handles(cls, path: Path) -> bool:
+        return path.suffix in {".yml", ".yaml"}
 
     def load(self, path: Path) -> Dict[str, Any]:
         return yaml.safe_load(path.read_text())
@@ -19,3 +23,6 @@ class YAMLFormat(Format):
         path.write_text(
             yaml.safe_dump(config, indent=self.indent, sort_keys=self.sort_keys)
         )
+
+
+BaseConfig.register_format(YAMLFormat)

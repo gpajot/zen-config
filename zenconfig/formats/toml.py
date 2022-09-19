@@ -5,15 +5,27 @@ from typing import Any, Dict
 import tomli
 import tomli_w
 
-from zenconfig.formats.abc import Format
+from zenconfig.base import BaseConfig, Format
 
 
 @dataclass
 class TOMLFormat(Format):
     multiline_strings: bool = True
 
+    @classmethod
+    def handles(cls, path: Path) -> bool:
+        return path.suffix == ".toml"
+
     def load(self, path: Path) -> Dict[str, Any]:
         return tomli.loads(path.read_text())
 
     def dump(self, path: Path, config: Dict[str, Any]) -> None:
-        path.write_text(tomli_w.dumps(config, multiline_strings=self.multiline_strings))
+        path.write_text(
+            tomli_w.dumps(
+                config,
+                multiline_strings=self.multiline_strings,
+            )
+        )
+
+
+BaseConfig.register_format(TOMLFormat)

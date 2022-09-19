@@ -1,12 +1,16 @@
 from dataclasses import asdict, fields, is_dataclass
 from typing import Any, Dict, Type, TypeVar
 
-from zenconfig.schemas.abc import Schema
+from zenconfig.base import BaseConfig, Schema
 
 C = TypeVar("C")
 
 
 class DataclassSchema(Schema[C]):
+    @classmethod
+    def handles(cls, config_class: type) -> bool:
+        return is_dataclass(config_class)
+
     def from_dict(self, cls: Type[C], cfg: Dict[str, Any]) -> C:
         return _load_nested(cls, cfg)
 
@@ -18,6 +22,9 @@ class DataclassSchema(Schema[C]):
                 value = asdict(value)
             cfg[field.name] = value
         return cfg
+
+
+BaseConfig.register_schema(DataclassSchema)
 
 
 def _load_nested(cls: Type[C], cfg: Dict[str, Any]) -> C:

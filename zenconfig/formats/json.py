@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict
 
-from zenconfig.formats.abc import Format
+from zenconfig.base import BaseConfig, Format
 
 
 @dataclass
@@ -11,6 +11,10 @@ class JSONFormat(Format):
     indent: int = 2
     sort_keys: bool = True
     ensure_ascii: bool = False
+
+    @classmethod
+    def handles(cls, path: Path) -> bool:
+        return path.suffix == ".json"
 
     def load(self, path: Path) -> Dict[str, Any]:
         return json.loads(path.read_text())
@@ -24,3 +28,6 @@ class JSONFormat(Format):
                 ensure_ascii=self.ensure_ascii,
             ),
         )
+
+
+BaseConfig.register_format(JSONFormat)
