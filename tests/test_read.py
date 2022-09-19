@@ -2,9 +2,8 @@ from pathlib import Path
 
 import pytest
 
-from zenconfig.formats.abc import Format
+from zenconfig.base import Format, Schema
 from zenconfig.read import ReadOnlyConfig
-from zenconfig.schemas.abc import Schema
 
 
 class TestReadOnlyConfig:
