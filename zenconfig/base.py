@@ -156,6 +156,7 @@ def _handle_globbing(original_path: Path) -> Iterator[Path]:
     if not glob:
         yield original_path
     else:
-        for path in directory.rglob(str(original_path.relative_to(directory))):
+        pattern = str(original_path.relative_to(directory))
+        for path in directory.rglob(pattern):
             if path.is_file():
                 yield path

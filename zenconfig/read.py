@@ -1,8 +1,11 @@
+import logging
 from abc import ABC
 from enum import IntEnum
 from typing import Any, ClassVar, Dict, Type, TypeVar
 
 from zenconfig.base import BaseConfig, ZenConfigError
+
+logger = logging.getLogger(__name__)
 
 
 class MergeStrategy(IntEnum):
@@ -26,7 +29,14 @@ class ReadOnlyConfig(BaseConfig, ABC):
         """Load the configuration class from file(s)."""
         dict_config: Dict[str, Any] = {}
         for path in cls._paths():
-            config = cls._format(path).load(path)
+            fmt = cls._format(path)
+            logger.debug(
+                "using %s to load %s from %s",
+                fmt.__class__.__name__,
+                cls.__name__,
+                path,
+            )
+            config = fmt.load(path)
             if not dict_config:
                 dict_config = config
             elif cls.MERGE_STRATEGY is MergeStrategy.SHALLOW:
