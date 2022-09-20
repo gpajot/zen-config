@@ -2,6 +2,7 @@ from pathlib import Path
 
 import pytest
 
+from zenconfig.base import ZenConfigError
 from zenconfig.write import Config
 
 
@@ -10,5 +11,5 @@ class TestReadOnlyConfig:
         class Cfg(Config):
             _PATHS = (Path(), Path())
 
-        with pytest.raises(ValueError, match="cannot save"):
+        with pytest.raises(ZenConfigError, match="cannot save"):
             Cfg().save()

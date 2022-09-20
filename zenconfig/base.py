@@ -15,6 +15,10 @@ from typing import (
 )
 
 
+class ZenConfigError(Exception):
+    """Default error when Handling config files."""
+
+
 class Format(ABC):
     @classmethod
     @abstractmethod
@@ -77,7 +81,7 @@ class BaseConfig(ABC):
         if not found_path:
             found_path = cls.PATH
         if not found_path:
-            raise ValueError(
+            raise ZenConfigError(
                 f"could not find the config path for config {cls.__qualname__}, tried env variable {cls.ENV_PATH}"
             )
         cls._PATHS = tuple(_handle_globbing(Path(found_path).expanduser().absolute()))
@@ -92,7 +96,9 @@ class BaseConfig(ABC):
         else:
             paths = cls._paths()
             if len(paths) != 1:
-                raise ValueError("multiple configuration files, use the path parameter")
+                raise ZenConfigError(
+                    "multiple configuration files, use the path parameter"
+                )
             _path = paths[0]
         for format_class in cls.FORMATS:
             if not format_class.handles(_path):
@@ -101,7 +107,7 @@ class BaseConfig(ABC):
             if not path:
                 cls.FORMAT = fmt
             return fmt
-        raise ValueError(
+        raise ZenConfigError(
             f"unsupported config file {path.name} for config {cls.__qualname__}, maybe you are missing an extra"  # type: ignore
         )
 
@@ -114,7 +120,7 @@ class BaseConfig(ABC):
                 continue
             cls.SCHEMA = schema_class()
             return cls.SCHEMA
-        raise ValueError(
+        raise ZenConfigError(
             f"could not infer config schema for config {cls.__qualname__}, maybe you are missing an extra"
         )
 

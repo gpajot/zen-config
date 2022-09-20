@@ -2,6 +2,7 @@ import sys
 from abc import ABC
 from typing import ClassVar, Dict
 
+from zenconfig.base import ZenConfigError
 from zenconfig.read import ReadOnlyConfig
 
 
@@ -12,7 +13,9 @@ class Config(ReadOnlyConfig, ABC):
         """Save the current config to the file."""
         paths = self._paths()
         if len(paths) != 1:
-            raise ValueError("cannot save when handling multiple configuration files")
+            raise ZenConfigError(
+                "cannot save when handling multiple configuration files"
+            )
         path = paths[0]
         if not path.exists():
             path.touch(mode=self.FILE_MODE)
