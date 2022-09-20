@@ -1,11 +1,10 @@
 # zen-config
 
-[![Tests Status](https://github.com/gpajot/zen-config/workflows/Test/badge.svg?branch=main&event=push)](https://github.com/gpajot/zen-config/actions?query=workflow%3ATest+branch%3Amain+event%3Apush)
-[![Stable Version](https://img.shields.io/pypi/v/zenconfig?label=stable)](https://pypi.org/project/zenconfig/)
+[![tests](https://github.com/gpajot/zen-config/workflows/Test/badge.svg?branch=main&event=push)](https://github.com/gpajot/zen-config/actions?query=workflow%3ATest+branch%3Amain+event%3Apush)
+[![version](https://img.shields.io/pypi/v/zenconfig?label=stable)](https://pypi.org/project/zenconfig/)
+[![python](https://img.shields.io/pypi/pyversions/zenconfig)](https://pypi.org/project/zenconfig/)
 
 Simple configuration loader for python.
-
-It requires python 3.7+.
 
 Compared to other solutions, the goal is to bring:
 - simple usage for simple use cases
@@ -46,6 +45,9 @@ User constructs will be expanded.
 If the file does not exist it will be created (not parent directories though).
 You can specify the file mode via `Config.FILE_MODE`.
 
+The config can be loaded from multiple files, see [fnmatch](https://docs.python.org/3/library/fnmatch.html) for syntax.
+Note that you will not be able to save if not handling exactly one file.
+
 ## Read only
 If you do not want to be able to modify the config from your code, you can use `ReadOnlyConfig`.
 
@@ -56,12 +58,14 @@ Currently, those formats are supported:
 - TOML - requires the `toml` extra
 
 The format is automatically inferred from the config file extension.
+When loading from multiple files, files can be of multiple formats.
 
 Other formats can be added by subclassing `Format`.
 
 To register more formats: `Config.register_format(MyFormat)`.
 
-You can also force the format using `Config.FORMAT = MyFormat(...)`. This can be used to disable auto selection, or pass parameters to the format. 
+You can also force the format using `Config.FORMAT = MyFormat(...)`.
+This can be used to disable auto selection, or pass parameters to the format. 
 
 ## Supported schemas
 Currently, those schemas are supported:
@@ -76,7 +80,8 @@ Other schemas can be added by subclassing `Schema`.
 
 To register more schemas: `Config.register_schema(MySchema)`.
 
-You can also force the schema using `Config.SCHEMA = MySchema(...)`. This can be used to disable auto selection, or pass parameters to the schema.
+You can also force the schema using `Config.SCHEMA = MySchema(...)`.
+This can be used to disable auto selection, or pass parameters to the schema.
 
 To use pydantic:
 ```python

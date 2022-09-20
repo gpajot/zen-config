@@ -1,7 +1,18 @@
 import os
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Any, ClassVar, Dict, Generic, List, Type, TypeVar, Union
+from typing import (
+    Any,
+    ClassVar,
+    Dict,
+    Generic,
+    Iterator,
+    List,
+    Optional,
+    Tuple,
+    Type,
+    TypeVar,
+)
 
 
 class Format(ABC):
@@ -39,14 +50,14 @@ class Schema(ABC, Generic[C]):
 
 class BaseConfig(ABC):
     ENV_PATH: ClassVar[str] = "CONFIG"
-    PATH: ClassVar[Union[str, None]] = None
-    _PATH: ClassVar[Union[Path, None]] = None
+    PATH: ClassVar[Optional[str]] = None
+    _PATHS: ClassVar[Optional[Tuple[Path, ...]]] = None
 
     FORMATS: ClassVar[List[Type[Format]]] = []
-    FORMAT: ClassVar[Union[Format, None]] = None
+    FORMAT: ClassVar[Optional[Format]] = None
 
     SCHEMAS: ClassVar[List[Type[Schema]]] = []
-    SCHEMA: ClassVar[Union[Schema, None]] = None
+    SCHEMA: ClassVar[Optional[Schema]] = None
 
     @classmethod
     def register_format(cls, format_class: Type[Format]) -> None:
@@ -57,10 +68,10 @@ class BaseConfig(ABC):
         cls.SCHEMAS.append(schema_class)
 
     @classmethod
-    def _path(cls) -> Path:
-        if cls._PATH:
-            return cls._PATH
-        found_path: Union[str, None] = None
+    def _paths(cls) -> Tuple[Path, ...]:
+        if cls._PATHS:
+            return cls._PATHS
+        found_path: Optional[str] = None
         if cls.ENV_PATH:
             found_path = os.environ.get(cls.ENV_PATH)
         if not found_path:
@@ -69,22 +80,29 @@ class BaseConfig(ABC):
             raise ValueError(
                 f"could not find the config path for config {cls.__qualname__}, tried env variable {cls.ENV_PATH}"
             )
-        cls._PATH = Path(found_path).expanduser().absolute()
-        return cls._PATH
+        cls._PATHS = tuple(_handle_globbing(Path(found_path).expanduser().absolute()))
+        return cls._PATHS
 
     @classmethod
-    def _format(cls) -> Format:
+    def _format(cls, path: Optional[Path] = None) -> Format:
         if cls.FORMAT:
             return cls.FORMAT
-        ext = cls._path().suffix
-        path = cls._path()
+        if path:
+            _path = path
+        else:
+            paths = cls._paths()
+            if len(paths) != 1:
+                raise ValueError("multiple configuration files, use the path parameter")
+            _path = paths[0]
         for format_class in cls.FORMATS:
-            if not format_class.handles(path):
+            if not format_class.handles(_path):
                 continue
-            cls.FORMAT = format_class()
-            return cls.FORMAT
+            fmt = format_class()
+            if not path:
+                cls.FORMAT = fmt
+            return fmt
         raise ValueError(
-            f"unsupported config file extension {ext} for config {cls.__qualname__}, maybe you are missing an extra"
+            f"unsupported config file {path.name} for config {cls.__qualname__}, maybe you are missing an extra"  # type: ignore
         )
 
     @classmethod
@@ -99,3 +117,17 @@ class BaseConfig(ABC):
         raise ValueError(
             f"could not infer config schema for config {cls.__qualname__}, maybe you are missing an extra"
         )
+
+
+def _handle_globbing(original_path: Path) -> Iterator[Path]:
+    directory = Path(original_path)
+    glob = False
+    while "*" in directory.name or "?" in directory.name or "[" in directory.name:
+        directory = directory.parent
+        glob = True
+    if not glob:
+        yield original_path
+    else:
+        for path in directory.rglob(str(original_path.relative_to(directory))):
+            if path.is_file():
+                yield path

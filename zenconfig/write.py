@@ -10,13 +10,18 @@ class Config(ReadOnlyConfig, ABC):
 
     def save(self) -> None:
         """Save the current config to the file."""
-        if not self._path().exists():
-            self._path().touch(mode=self.FILE_MODE)
-        self._format().dump(self._path(), self._schema().to_dict(self))
+        paths = self._paths()
+        if len(paths) != 1:
+            raise ValueError("cannot save when handling multiple configuration files")
+        path = paths[0]
+        if not path.exists():
+            path.touch(mode=self.FILE_MODE)
+        self._format().dump(path, self._schema().to_dict(self))
 
     def clear(self) -> None:
         """Remove the config file."""
         kwargs: Dict[str, bool] = {}
         if sys.version_info[:2] != (3, 7):
             kwargs["missing_ok"] = True
-        self._path().unlink(**kwargs)
+        for path in self._paths():
+            path.unlink(**kwargs)

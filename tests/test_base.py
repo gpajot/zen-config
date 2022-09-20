@@ -23,17 +23,24 @@ class TestBaseConfig:
 
         return Config
 
-    def test_path_should_raise_if_nothing_provided(self, config):
+    def test_paths_should_raise_if_nothing_provided(self, config):
         with pytest.raises(ValueError, match="could not find the config path"):
-            config._path()
+            config._paths()
 
-    def test_path_should_fallback_on_default_if_no_env(self, config):
+    def test_paths_should_fallback_on_default_if_no_env(self, config):
         config.ENV_PATH = "THE_PATH"
         config.PATH = "the_path.json"
-        assert config._path() == Path(".").absolute() / "the_path.json"
+        assert config._paths() == (Path(".").absolute() / "the_path.json",)
 
-    def test_path_should_prefer_env_value(self, config):
+    def test_paths_should_prefer_env_value(self, config):
         config.ENV_PATH = "THE_PATH"
         config.PATH = "the_path.json"
         os.environ["THE_PATH"] = "the_env_path.json"
-        assert config._path() == Path(".").absolute() / "the_env_path.json"
+        assert config._paths() == (Path(".").absolute() / "the_env_path.json",)
+
+    def test_paths_should_handle_globbing(self, config):
+        config.PATH = "./*/config_?.*"
+        assert config._paths() == (
+            Path(__file__).parent.absolute() / "test_files" / "config_a.yaml",
+            Path(__file__).parent.absolute() / "test_files" / "config_b.toml",
+        )
