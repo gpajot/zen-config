@@ -72,6 +72,7 @@ Currently, those schemas are supported:
 - plain dict
 - dataclasses
 - pydantic models - requires the `pydantic` extra
+- attrs - requires the attrs extra
 
 
 The schema is automatically inferred from the config class.

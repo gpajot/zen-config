@@ -1,34 +1,41 @@
-from dataclasses import asdict, fields, is_dataclass
-from typing import Any, Dict, Type, TypeVar
+from typing import TYPE_CHECKING, Any, Dict, Type, TypeVar
+
+import attrs
 
 from zenconfig.base import BaseConfig, Schema
 
-C = TypeVar("C")
+AttrsInstance: Any
+if TYPE_CHECKING:
+    from attr import AttrsInstance
+else:
+    AttrsInstance = Any
+
+C = TypeVar("C", bound=AttrsInstance)
 
 
-class DataclassSchema(Schema[C]):
+class AttrsSchema(Schema[C]):
     @classmethod
     def handles(cls, config_class: type) -> bool:
-        return is_dataclass(config_class)
+        return attrs.has(config_class)
 
     def from_dict(self, cls: Type[C], cfg: Dict[str, Any]) -> C:
         return _load_nested(cls, cfg)
 
     def to_dict(self, config: C) -> Dict[str, Any]:
-        return asdict(config)
+        return attrs.asdict(config)
 
 
-BaseConfig.register_schema(DataclassSchema)
+BaseConfig.register_schema(AttrsSchema)
 
 
 def _load_nested(cls: Type[C], cfg: Dict[str, Any]) -> C:
-    """Load nested dataclasses."""
+    """Load nested attrs."""
     kwargs: Dict[str, Any] = {}
-    for field in fields(cls):
+    for field in attrs.fields(cls):
         if field.name not in cfg:
             continue
         value = cfg[field.name]
-        if is_dataclass(field.type):
+        if attrs.has(field.type):
             value = _load_nested(field.type, value)
         kwargs[field.name] = value
     return cls(**kwargs)
