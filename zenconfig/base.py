@@ -20,6 +20,8 @@ class ZenConfigError(Exception):
 
 
 class Format(ABC):
+    """Abstract class for handling different file formats."""
+
     @classmethod
     @abstractmethod
     def handles(cls, path: Path) -> bool:
@@ -38,6 +40,8 @@ C = TypeVar("C")
 
 
 class Schema(ABC, Generic[C]):
+    """Abstract class for handling different config class types."""
+
     @classmethod
     @abstractmethod
     def handles(cls, config_class: type) -> bool:
@@ -53,26 +57,39 @@ class Schema(ABC, Generic[C]):
 
 
 class BaseConfig(ABC):
+    """Abstract base class for handling config files."""
+
+    # Environment variable name holding the config file path to load.
     ENV_PATH: ClassVar[str] = "CONFIG"
+    # Hardcoded config file path to load.
+    # Fallback when no path is found in the environment variable.
     PATH: ClassVar[Optional[str]] = None
+    # Paths of all config files handled.
     _PATHS: ClassVar[Optional[Tuple[Path, ...]]] = None
 
+    # All format classes supported.
     FORMATS: ClassVar[List[Type[Format]]] = []
+    # Selected format class instance.
     FORMAT: ClassVar[Optional[Format]] = None
 
+    # All schema classes supported.
     SCHEMAS: ClassVar[List[Type[Schema]]] = []
+    # Selected schema class instance.
     SCHEMA: ClassVar[Optional[Schema]] = None
 
     @classmethod
     def register_format(cls, format_class: Type[Format]) -> None:
+        """Add a format class to the list of supported ones."""
         cls.FORMATS.append(format_class)
 
     @classmethod
     def register_schema(cls, schema_class: Type[Schema]) -> None:
+        """Add a schema class to the list of supported ones."""
         cls.SCHEMAS.append(schema_class)
 
     @classmethod
     def _paths(cls) -> Tuple[Path, ...]:
+        """Cached method to get all handled file paths."""
         if cls._PATHS:
             return cls._PATHS
         found_path: Optional[str] = None
@@ -89,6 +106,7 @@ class BaseConfig(ABC):
 
     @classmethod
     def _format(cls, path: Optional[Path] = None) -> Format:
+        """Get the format instance for a path."""
         if cls.FORMAT:
             return cls.FORMAT
         if path:
@@ -113,6 +131,7 @@ class BaseConfig(ABC):
 
     @classmethod
     def _schema(cls) -> Schema:
+        """Get the schema instance for this config class."""
         if cls.SCHEMA:
             return cls.SCHEMA
         for schema_class in cls.SCHEMAS:
@@ -126,6 +145,7 @@ class BaseConfig(ABC):
 
 
 def _handle_globbing(original_path: Path) -> Iterator[Path]:
+    """Convert a glob path to all matched paths."""
     directory = Path(original_path)
     glob = False
     while "*" in directory.name or "?" in directory.name or "[" in directory.name:
