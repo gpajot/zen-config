@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from zenconfig.base import BaseConfig, Format, Schema
+from zenconfig.base import BaseConfig, Format, Schema, ZenConfigError
 
 
 class TestBaseConfig:
@@ -24,7 +24,7 @@ class TestBaseConfig:
         return Config
 
     def test_paths_should_raise_if_nothing_provided(self, config):
-        with pytest.raises(ValueError, match="could not find the config path"):
+        with pytest.raises(ZenConfigError, match="could not find the config path"):
             config._paths()
 
     def test_paths_should_fallback_on_default_if_no_env(self, config):

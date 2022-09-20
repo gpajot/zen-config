@@ -2,7 +2,7 @@ from abc import ABC
 from enum import IntEnum
 from typing import Any, ClassVar, Dict, Type, TypeVar
 
-from zenconfig.base import BaseConfig
+from zenconfig.base import BaseConfig, ZenConfigError
 
 
 class MergeStrategy(IntEnum):
@@ -28,7 +28,7 @@ class ReadOnlyConfig(BaseConfig, ABC):
             elif cls.MERGE_STRATEGY is MergeStrategy.DEEP:
                 _deep_merge(dict_config, config)
             else:
-                raise ValueError(f"unsupported merge strategy {cls.MERGE_STRATEGY}")
+                raise ZenConfigError(f"unsupported merge strategy {cls.MERGE_STRATEGY}")
         return cls._schema().from_dict(cls, dict_config)
 
 
