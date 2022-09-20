@@ -101,7 +101,9 @@ class BaseConfig(ABC):
             raise ZenConfigError(
                 f"could not find the config path for config {cls.__qualname__}, tried env variable {cls.ENV_PATH}"
             )
-        cls._PATHS = tuple(_handle_globbing(Path(found_path).expanduser().absolute()))
+        cls._PATHS = tuple(
+            sorted(_handle_globbing(Path(found_path).expanduser().absolute()))
+        )
         return cls._PATHS
 
     @classmethod
