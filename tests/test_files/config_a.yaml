@@ -1,0 +1,6 @@
+a: a
+b: 1
+deep:
+  c: true
+  deeper:
+    d: false

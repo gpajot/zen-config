@@ -1,31 +1,32 @@
-from pathlib import Path
-
 import pytest
 
-from zenconfig.base import Format, Schema
-from zenconfig.read import ReadOnlyConfig
+from zenconfig.base import Schema
+from zenconfig.read import MergeStrategy, ReadOnlyConfig
 
 
 class TestReadOnlyConfig:
-    @pytest.fixture()
-    def fmt(self, mocker):
-        return mocker.Mock(spec=Format)
+    @pytest.mark.parametrize(
+        ("merge_strategy", "expected"),
+        [
+            (
+                MergeStrategy.SHALLOW,
+                {"a": "a", "b": 2, "deep": {"deeper": {"d": True}}},
+            ),
+            (
+                MergeStrategy.DEEP,
+                {"a": "a", "b": 2, "deep": {"c": True, "deeper": {"d": True}}},
+            ),
+        ],
+    )
+    def test_should_be_able_to_load_from_multiple_files(
+        self, merge_strategy, expected, mocker
+    ):
+        schema = mocker.Mock(spec=Schema)
+        schema.from_dict.side_effect = lambda _, d: d
 
-    @pytest.fixture()
-    def schema(self, mocker):
-        return mocker.Mock(spec=Schema)
-
-    @pytest.fixture()
-    def config(self, fmt, schema):
-        class Config(ReadOnlyConfig):
-            FORMAT = fmt
+        class Cfg(ReadOnlyConfig):
+            PATH = "./*/config_?.*"
+            MERGE_STRATEGY = merge_strategy
             SCHEMA = schema
 
-        return Config
-
-    def test_should_be_able_to_load_from_file(self, fmt, schema, config):
-        config._PATH = Path("test.json")
-        fmt.load.side_effect = lambda p: {"a": str(p)}
-        schema.from_dict.side_effect = lambda c, o: (c, o)
-
-        assert config.load() == (config, {"a": "test.json"})
+        assert Cfg.load() == expected
