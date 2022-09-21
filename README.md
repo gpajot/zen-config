@@ -82,13 +82,16 @@ To register more schemas: `Config.register_schema(MySchema(...), lambda cls: ...
 You can also force the schema by directly overriding the `SCHEMA` class attribute on your config.
 This can be used to disable auto selection, or pass arguments to the schema instance.
 
-> ⚠️ Be careful about value type conversions with more complex types.
-> Not all formats and schemas support all conversions you would expect.
-> For pydantic classes and json, custom encoders are taken into account.
-
 > ⚠️ When using pydantic, you have to supply the `ClassVar` type annotations
 > to all class variable you override
 > otherwise pydantic will treat those as its own fields and complain.
+
+### Conversions
+For all schemas and formats, common built in types are handled [when dumping](https://github.com/gpajot/zen-config/blob/main/zenconfig/encoder.py).
+
+> ⚠️ Keep in mind that only `attrs` and `pydantic` support casting when loading the config.
+
+You can add custom encoders with `Config.ENCODERS`. For `pydantic`, stick with [the standard way of doing it](https://pydantic-docs.helpmanual.io/usage/exporting_models/#json_encoders).
 
 ## Contributing
 See [contributing guide](https://github.com/gpajot/zen-config/blob/main/CONTRIBUTING.md).

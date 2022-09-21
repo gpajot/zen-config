@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING, Any, Dict, Type, TypeVar
 import attrs
 
 from zenconfig.base import BaseConfig, Schema
+from zenconfig.encoder import Encoder
 
 AttrsInstance: Any
 if TYPE_CHECKING:
@@ -17,8 +18,8 @@ class AttrsSchema(Schema[C]):
     def from_dict(self, cls: Type[C], cfg: Dict[str, Any]) -> C:
         return _load_nested(cls, cfg)
 
-    def to_dict(self, config: C) -> Dict[str, Any]:
-        return attrs.asdict(config)
+    def to_dict(self, config: C, encoder: Encoder) -> Dict[str, Any]:
+        return encoder(attrs.asdict(config))
 
 
 BaseConfig.register_schema(AttrsSchema(), attrs.has)

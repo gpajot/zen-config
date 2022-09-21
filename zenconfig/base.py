@@ -15,12 +15,7 @@ from typing import (
     TypeVar,
 )
 
-_default_encoder: Optional[Callable[[Any], Any]]
-try:
-    # Try to use the pydantic encoder if available.
-    from pydantic.json import pydantic_encoder as _default_encoder
-except ImportError:
-    _default_encoder = None
+from zenconfig.encoder import Encoder
 
 
 class ZenConfigError(Exception):
@@ -39,7 +34,6 @@ class Format(ABC):
         self,
         path: Path,
         config: Dict[str, Any],
-        encoder: Optional[Callable[[Any], Any]],
     ) -> None:
         """Dump in the configuration file."""
 
@@ -50,15 +44,12 @@ C = TypeVar("C")
 class Schema(ABC, Generic[C]):
     """Abstract class for handling different config class types."""
 
-    def encoder(self, config: C) -> Optional[Callable[[Any], Any]]:
-        return _default_encoder
-
     @abstractmethod
     def from_dict(self, cls: Type[C], cfg: Dict[str, Any]) -> C:
         """Load the schema based on a dict configuration."""
 
     @abstractmethod
-    def to_dict(self, config: Any) -> Dict[str, Any]:
+    def to_dict(self, config: Any, encoder: Encoder) -> Dict[str, Any]:
         """Dump the config to dict."""
 
 
