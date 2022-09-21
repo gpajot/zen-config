@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Callable, Dict, Optional
+from typing import Any, Dict
 
 import tomli
 import tomli_w
@@ -19,7 +19,6 @@ class TOMLFormat(Format):
         self,
         path: Path,
         config: Dict[str, Any],
-        encoder: Optional[Callable[[Any], Any]],
     ) -> None:
         path.write_text(
             tomli_w.dumps(

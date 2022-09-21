@@ -1,9 +1,11 @@
 import logging
 import sys
 from abc import ABC
-from typing import ClassVar, Dict
+from functools import partial
+from typing import ClassVar, Dict, Optional
 
 from zenconfig.base import ZenConfigError
+from zenconfig.encoder import Encoder, Encoders, combine_encoders, encode
 from zenconfig.read import ReadOnlyConfig
 
 logger = logging.getLogger(__name__)
@@ -14,6 +16,10 @@ class Config(ReadOnlyConfig, ABC):
 
     # File mode used if we need to create the config file.
     FILE_MODE: ClassVar[int] = 0o600
+    # Add custom encoders.
+    ENCODERS: ClassVar[Encoders] = {}
+    # Cached encoder.
+    __ENCODER: ClassVar[Optional[Encoder]] = None
 
     def save(self) -> None:
         """Save the current config to the file."""
@@ -34,7 +40,7 @@ class Config(ReadOnlyConfig, ABC):
             path,
         )
         schema = self._schema()
-        fmt.dump(path, schema.to_dict(self), schema.encoder(self))
+        fmt.dump(path, schema.to_dict(self, self._encoder()))
 
     def clear(self) -> None:
         """Delete the config file(s)."""
@@ -44,3 +50,12 @@ class Config(ReadOnlyConfig, ABC):
         for path in self._paths():
             logger.debug("deleting file at path %s", path)
             path.unlink(**kwargs)
+
+    @classmethod
+    def _encoder(cls) -> Encoder:
+        """Get the encoder, taking into account custom encoders."""
+        if cls.__ENCODER:
+            return cls.__ENCODER
+        encoder = combine_encoders(cls.ENCODERS)
+        cls.__ENCODER = partial(encode, encoder)
+        return cls.__ENCODER

@@ -2,6 +2,7 @@ from dataclasses import asdict, fields, is_dataclass
 from typing import Any, Dict, Type, TypeVar
 
 from zenconfig.base import BaseConfig, Schema
+from zenconfig.encoder import Encoder
 
 C = TypeVar("C")
 
@@ -10,8 +11,8 @@ class DataclassSchema(Schema[C]):
     def from_dict(self, cls: Type[C], cfg: Dict[str, Any]) -> C:
         return _load_nested(cls, cfg)
 
-    def to_dict(self, config: C) -> Dict[str, Any]:
-        return asdict(config)
+    def to_dict(self, config: C, encoder: Encoder) -> Dict[str, Any]:
+        return encoder(asdict(config))
 
 
 BaseConfig.register_schema(DataclassSchema(), is_dataclass)

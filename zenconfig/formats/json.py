@@ -1,7 +1,7 @@
 import json
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Callable, Dict, Optional
+from typing import Any, Dict
 
 from zenconfig.base import BaseConfig, Format
 
@@ -19,7 +19,6 @@ class JSONFormat(Format):
         self,
         path: Path,
         config: Dict[str, Any],
-        encoder: Optional[Callable[[Any], Any]],
     ) -> None:
         path.write_text(
             json.dumps(
@@ -27,7 +26,6 @@ class JSONFormat(Format):
                 indent=self.indent,
                 sort_keys=self.sort_keys,
                 ensure_ascii=self.ensure_ascii,
-                default=encoder,
             ),
         )
 

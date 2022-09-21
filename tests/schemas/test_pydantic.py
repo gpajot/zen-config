@@ -1,19 +1,15 @@
-from enum import Enum
 from typing import ClassVar
 
 from pydantic import BaseModel
 
+from tests.schemas.utils import AnEnum, encoders, parametrize_formats
 from zenconfig.schemas.pydantic import PydanticSchema
 from zenconfig.write import Config
 
 
-class AnEnum(Enum):
-    ONE = 1
-    TWO = 2
-
-
 class DeeperPydanticConfig(BaseModel):
     d: bool
+    e: AnEnum
 
 
 class DeepPydanticConfig(BaseModel):
@@ -21,34 +17,33 @@ class DeepPydanticConfig(BaseModel):
     deeper: DeeperPydanticConfig
 
 
-class PydanticConfig(Config, BaseModel):
-    PATH: ClassVar[str] = "test.json"
+@parametrize_formats
+def test_pydantic(fmt, path):
+    class PydanticConfig(Config, BaseModel):
+        PATH: ClassVar[str] = path
 
-    class Config:
-        json_encoders = {
-            # Test if custom encoders are working.
-            AnEnum: lambda e: AnEnum.TWO.value,
-        }
+        class Config:
+            json_encoders = encoders
 
-    a: str
-    b: AnEnum
-    deep: DeepPydanticConfig
+        a: str
+        b: int
+        deep: DeepPydanticConfig
 
-
-def test_pydantic():
+    assert isinstance(PydanticConfig._format(), fmt)
     assert isinstance(PydanticConfig._schema(), PydanticSchema)
     cfg = PydanticConfig(
         a="a",
-        b=AnEnum.ONE,
+        b=1,
         deep=DeepPydanticConfig(
             c=False,
-            deeper=DeeperPydanticConfig(d=True),
+            deeper=DeeperPydanticConfig(d=True, e=AnEnum.ONE),
         ),
     )
     cfg.save()
     reloaded = PydanticConfig.load()
     assert reloaded.a == "a"
-    assert reloaded.b is AnEnum.TWO
+    assert reloaded.b == 1
     assert reloaded.deep.c is False
     assert reloaded.deep.deeper.d is True
+    assert reloaded.deep.deeper.e is AnEnum.TWO
     cfg.clear()
