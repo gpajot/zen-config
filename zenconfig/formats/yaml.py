@@ -25,4 +25,4 @@ class YAMLFormat(Format):
         )
 
 
-BaseConfig.register_format(YAMLFormat)
+BaseConfig.register_format(YAMLFormat(), ".yaml", ".yml")
