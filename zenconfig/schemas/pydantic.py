@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any, Dict, Type, TypeVar
+from typing import Any, Callable, Dict, Type, TypeVar
 
 from pydantic import BaseModel
 
@@ -9,13 +9,13 @@ C = TypeVar("C", bound=BaseModel)
 
 
 @dataclass
-class PydanticSchema(Schema[BaseModel]):
+class PydanticSchema(Schema[C]):
     exclude_unset: bool = False
     exclude_defaults: bool = True
 
-    @classmethod
-    def handles(cls, config_class: type) -> bool:
-        return issubclass(config_class, BaseModel)
+    def encoder(self, config: C) -> Callable[[Any], Any]:
+        """Use the class custom encoder."""
+        return config.__json_encoder__  # type: ignore
 
     def from_dict(self, cls: Type[C], cfg: Dict[str, Any]) -> C:
         return cls.parse_obj(cfg)
@@ -27,4 +27,4 @@ class PydanticSchema(Schema[BaseModel]):
         )
 
 
-BaseConfig.register_schema(PydanticSchema)
+BaseConfig.register_schema(PydanticSchema(), lambda cls: issubclass(cls, BaseModel))

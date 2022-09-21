@@ -73,24 +73,18 @@ Currently, those schemas are supported:
 - pydantic models - requires the `pydantic` extra
 - attrs - requires the attrs extra
 
-
 The schema is automatically inferred from the config class.
 
 Other schemas can be added by subclassing `Schema`.
 
-To register more schemas: `Config.register_schema(MySchema)`.
+To register more schemas: `Config.register_schema(MySchema(...), lambda cls: ...)`.
 
-You can also force the schema using `Config.SCHEMA = MySchema(...)`.
-This can be used to disable auto selection, or pass parameters to the schema.
+You can also force the schema by directly overriding the `SCHEMA` class attribute on your config.
+This can be used to disable auto selection, or pass arguments to the schema instance.
 
-To use pydantic:
-```python
-from pydantic import BaseModel
-from zenconfig import Config
-
-class MyPydanticConfig(Config, BaseModel):
-    ...
-```
+> ⚠️ Be careful about value type conversions with more complex types.
+> Not all formats and schemas support all conversions you would expect.
+> For pydantic classes and json, custom encoders are taken into account.
 
 > ⚠️ When using pydantic, you have to supply the `ClassVar` type annotations
 > to all class variable you override

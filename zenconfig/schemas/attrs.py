@@ -14,10 +14,6 @@ C = TypeVar("C", bound=AttrsInstance)
 
 
 class AttrsSchema(Schema[C]):
-    @classmethod
-    def handles(cls, config_class: type) -> bool:
-        return attrs.has(config_class)
-
     def from_dict(self, cls: Type[C], cfg: Dict[str, Any]) -> C:
         return _load_nested(cls, cfg)
 
@@ -25,7 +21,7 @@ class AttrsSchema(Schema[C]):
         return attrs.asdict(config)
 
 
-BaseConfig.register_schema(AttrsSchema)
+BaseConfig.register_schema(AttrsSchema(), attrs.has)
 
 
 def _load_nested(cls: Type[C], cfg: Dict[str, Any]) -> C:
