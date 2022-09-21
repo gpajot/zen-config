@@ -60,17 +60,15 @@ class BaseConfig(ABC):
     """Abstract base class for handling config files."""
 
     # Environment variable name holding the config file path to load.
-    ENV_PATH: ClassVar[str] = "CONFIG"
+    ENV_PATH: ClassVar[Optional[str]] = "CONFIG"
     # Hardcoded config file path to load.
     # Fallback when no path is found in the environment variable.
     PATH: ClassVar[Optional[str]] = None
     # Paths of all config files handled.
     _PATHS: ClassVar[Optional[Tuple[Path, ...]]] = None
 
-    # All format classes supported.
-    FORMATS: ClassVar[List[Type[Format]]] = []
-    # Selected format class instance.
-    FORMAT: ClassVar[Optional[Format]] = None
+    # All formats supported, by extension.
+    __FORMATS: ClassVar[Dict[str, Format]] = {}
 
     # All schema classes supported.
     SCHEMAS: ClassVar[List[Type[Schema]]] = []
@@ -78,9 +76,10 @@ class BaseConfig(ABC):
     SCHEMA: ClassVar[Optional[Schema]] = None
 
     @classmethod
-    def register_format(cls, format_class: Type[Format]) -> None:
+    def register_format(cls, fmt: Format, *extensions: str) -> None:
         """Add a format class to the list of supported ones."""
-        cls.FORMATS.append(format_class)
+        for ext in extensions:
+            cls.__FORMATS[ext] = fmt
 
     @classmethod
     def register_schema(cls, schema_class: Type[Schema]) -> None:
@@ -109,27 +108,20 @@ class BaseConfig(ABC):
     @classmethod
     def _format(cls, path: Optional[Path] = None) -> Format:
         """Get the format instance for a path."""
-        if cls.FORMAT:
-            return cls.FORMAT
         if path:
-            _path = path
+            suffix = path.suffix
         else:
             paths = cls._paths()
             if len(paths) != 1:
                 raise ZenConfigError(
                     "multiple configuration files, use the path parameter"
                 )
-            _path = paths[0]
-        for format_class in cls.FORMATS:
-            if not format_class.handles(_path):
-                continue
-            fmt = format_class()
-            if not path:
-                cls.FORMAT = fmt
-            return fmt
-        raise ZenConfigError(
-            f"unsupported config file {path.name} for config {cls.__qualname__}, maybe you are missing an extra"  # type: ignore
-        )
+            suffix = paths[0].suffix
+        if suffix not in cls.__FORMATS:
+            raise ZenConfigError(
+                f"unsupported extension {suffix} for config {cls.__qualname__}, maybe you are missing an extra"
+            )
+        return cls.__FORMATS[suffix]
 
     @classmethod
     def _schema(cls) -> Schema:

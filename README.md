@@ -62,10 +62,9 @@ When loading from multiple files, files can be of multiple formats.
 
 Other formats can be added by subclassing `Format`.
 
-To register more formats: `Config.register_format(MyFormat)`.
+To register more formats: `Config.register_format(MyFormat(...), ".ext1", ".ext2")`.
 
-You can also force the format using `Config.FORMAT = MyFormat(...)`.
-This can be used to disable auto selection, or pass parameters to the format. 
+> 💡 You can re-register a format to change dumping options.
 
 ## Supported schemas
 Currently, those schemas are supported:

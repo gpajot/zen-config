@@ -28,4 +28,4 @@ class TOMLFormat(Format):
         )
 
 
-BaseConfig.register_format(TOMLFormat)
+BaseConfig.register_format(TOMLFormat(), ".toml")

@@ -30,4 +30,4 @@ class JSONFormat(Format):
         )
 
 
-BaseConfig.register_format(JSONFormat)
+BaseConfig.register_format(JSONFormat(), ".json")
