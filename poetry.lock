@@ -440,7 +440,7 @@ yaml = ["PyYAML"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7,<3.11"
-content-hash = "f9d47f4f790722cb20618ee1b483a15caed718ee19453cbfce110110e7dd83d0"
+content-hash = "752be3ef0ff6602fa23ea4ccb270421de44f08919450ca3f20850f0e10320caf"
 
 [metadata.files]
 attrs = [
