@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import (
     Any,
+    Callable,
     ClassVar,
     Dict,
     Generic,
@@ -14,6 +15,13 @@ from typing import (
     TypeVar,
 )
 
+_default_encoder: Optional[Callable[[Any], Any]]
+try:
+    # Try to use the pydantic encoder if available.
+    from pydantic.json import pydantic_encoder as _default_encoder
+except ImportError:
+    _default_encoder = None
+
 
 class ZenConfigError(Exception):
     """Default error when Handling config files."""
@@ -22,17 +30,17 @@ class ZenConfigError(Exception):
 class Format(ABC):
     """Abstract class for handling different file formats."""
 
-    @classmethod
-    @abstractmethod
-    def handles(cls, path: Path) -> bool:
-        """Return whether the format handles the extension."""
-
     @abstractmethod
     def load(self, path: Path) -> Dict[str, Any]:
         """Load the configuration file into a dict."""
 
     @abstractmethod
-    def dump(self, path: Path, config: Dict[str, Any]) -> None:
+    def dump(
+        self,
+        path: Path,
+        config: Dict[str, Any],
+        encoder: Optional[Callable[[Any], Any]],
+    ) -> None:
         """Dump in the configuration file."""
 
 
@@ -42,10 +50,8 @@ C = TypeVar("C")
 class Schema(ABC, Generic[C]):
     """Abstract class for handling different config class types."""
 
-    @classmethod
-    @abstractmethod
-    def handles(cls, config_class: type) -> bool:
-        """Return whether the schema handles the config."""
+    def encoder(self, config: C) -> Optional[Callable[[Any], Any]]:
+        return _default_encoder
 
     @abstractmethod
     def from_dict(self, cls: Type[C], cfg: Dict[str, Any]) -> C:
@@ -60,20 +66,21 @@ class BaseConfig(ABC):
     """Abstract base class for handling config files."""
 
     # Environment variable name holding the config file path to load.
+    # Override to disable.
     ENV_PATH: ClassVar[Optional[str]] = "CONFIG"
     # Hardcoded config file path to load.
     # Fallback when no path is found in the environment variable.
     PATH: ClassVar[Optional[str]] = None
-    # Paths of all config files handled.
-    _PATHS: ClassVar[Optional[Tuple[Path, ...]]] = None
+    # Selected schema class instance.
+    # Override to disable auto selection or control dump options.
+    SCHEMA: ClassVar[Optional[Schema]] = None
 
+    # Paths of all config files handled.
+    __PATHS: ClassVar[Optional[Tuple[Path, ...]]] = None
     # All formats supported, by extension.
     __FORMATS: ClassVar[Dict[str, Format]] = {}
-
     # All schema classes supported.
-    SCHEMAS: ClassVar[List[Type[Schema]]] = []
-    # Selected schema class instance.
-    SCHEMA: ClassVar[Optional[Schema]] = None
+    __SCHEMAS: ClassVar[List[Tuple[Schema, Callable[[type], bool]]]] = []
 
     @classmethod
     def register_format(cls, fmt: Format, *extensions: str) -> None:
@@ -82,15 +89,19 @@ class BaseConfig(ABC):
             cls.__FORMATS[ext] = fmt
 
     @classmethod
-    def register_schema(cls, schema_class: Type[Schema]) -> None:
+    def register_schema(
+        cls,
+        schema: Schema,
+        handles: Callable[[type], bool],
+    ) -> None:
         """Add a schema class to the list of supported ones."""
-        cls.SCHEMAS.append(schema_class)
+        cls.__SCHEMAS.append((schema, handles))
 
     @classmethod
     def _paths(cls) -> Tuple[Path, ...]:
         """Cached method to get all handled file paths."""
-        if cls._PATHS:
-            return cls._PATHS
+        if cls.__PATHS:
+            return cls.__PATHS
         found_path: Optional[str] = None
         if cls.ENV_PATH:
             found_path = os.environ.get(cls.ENV_PATH)
@@ -100,10 +111,10 @@ class BaseConfig(ABC):
             raise ZenConfigError(
                 f"could not find the config path for config {cls.__qualname__}, tried env variable {cls.ENV_PATH}"
             )
-        cls._PATHS = tuple(
+        cls.__PATHS = tuple(
             sorted(_handle_globbing(Path(found_path).expanduser().absolute()))
         )
-        return cls._PATHS
+        return cls.__PATHS
 
     @classmethod
     def _format(cls, path: Optional[Path] = None) -> Format:
@@ -128,10 +139,10 @@ class BaseConfig(ABC):
         """Get the schema instance for this config class."""
         if cls.SCHEMA:
             return cls.SCHEMA
-        for schema_class in cls.SCHEMAS:
-            if not schema_class.handles(cls):
+        for schema, handles in cls.__SCHEMAS:
+            if not handles(cls):
                 continue
-            cls.SCHEMA = schema_class()
+            cls.SCHEMA = schema
             return cls.SCHEMA
         raise ZenConfigError(
             f"could not infer config schema for config {cls.__qualname__}, maybe you are missing an extra"

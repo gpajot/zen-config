@@ -33,7 +33,8 @@ class Config(ReadOnlyConfig, ABC):
             self.__class__.__name__,
             path,
         )
-        fmt.dump(path, self._schema().to_dict(self))
+        schema = self._schema()
+        fmt.dump(path, schema.to_dict(self), schema.encoder(self))
 
     def clear(self) -> None:
         """Delete the config file(s)."""

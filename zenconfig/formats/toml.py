@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Callable, Dict, Optional
 
 import tomli
 import tomli_w
@@ -12,14 +12,15 @@ from zenconfig.base import BaseConfig, Format
 class TOMLFormat(Format):
     multiline_strings: bool = True
 
-    @classmethod
-    def handles(cls, path: Path) -> bool:
-        return path.suffix == ".toml"
-
     def load(self, path: Path) -> Dict[str, Any]:
         return tomli.loads(path.read_text())
 
-    def dump(self, path: Path, config: Dict[str, Any]) -> None:
+    def dump(
+        self,
+        path: Path,
+        config: Dict[str, Any],
+        encoder: Optional[Callable[[Any], Any]],
+    ) -> None:
         path.write_text(
             tomli_w.dumps(
                 config,
