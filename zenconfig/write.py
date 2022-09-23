@@ -31,6 +31,7 @@ class Config(ReadOnlyConfig, ABC):
         path = paths[0]
         if not path.exists():
             logger.debug("creating file at path %s", path)
+            path.parent.mkdir(parents=True, exist_ok=True)
             path.touch(mode=self.FILE_MODE)
         fmt = self._format()
         logger.debug(
