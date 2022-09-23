@@ -29,6 +29,8 @@ class ReadOnlyConfig(BaseConfig, ABC):
         """Load the configuration class from file(s)."""
         dict_config: Dict[str, Any] = {}
         for path in cls._paths():
+            if not path.exists():
+                continue
             fmt = cls._format(path)
             logger.debug(
                 "using %s to load %s from %s",

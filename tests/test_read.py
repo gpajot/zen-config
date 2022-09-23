@@ -30,3 +30,9 @@ class TestReadOnlyConfig:
             SCHEMA = schema
 
         assert Cfg.load() == expected
+
+    def test_should_not_fail_if_file_does_not_exist(self):
+        class Cfg(ReadOnlyConfig, dict):
+            PATH = "test_config.json"
+
+        assert Cfg.load() == {}

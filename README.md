@@ -42,7 +42,7 @@ When creating your config, you can specify at least one of those two attributes:
 > 💡 When supplying both, if the env var is not set, it will use `PATH`.
 
 User constructs will be expanded.
-If the file does not exist it will be created (not parent directories though).
+If the file does not exist it will be created.
 You can specify the file mode via `Config.FILE_MODE`.
 
 The config can be loaded from multiple files, see [fnmatch](https://docs.python.org/3/library/fnmatch.html) for syntax.
