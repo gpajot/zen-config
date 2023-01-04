@@ -1,17 +1,11 @@
-from typing import TYPE_CHECKING, Any, Dict, Type, TypeVar
+from typing import Any, Dict, Type, TypeVar
 
 import attrs
 
 from zenconfig.base import BaseConfig, Schema
 from zenconfig.encoder import Encoder
 
-AttrsInstance: Any
-if TYPE_CHECKING:
-    from attr import AttrsInstance
-else:
-    AttrsInstance = Any
-
-C = TypeVar("C", bound=AttrsInstance)
+C = TypeVar("C", bound=attrs.AttrsInstance)
 
 
 class AttrsSchema(Schema[C]):
