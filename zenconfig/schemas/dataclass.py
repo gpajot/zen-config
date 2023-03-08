@@ -12,7 +12,7 @@ class DataclassSchema(Schema[C]):
         return _load_nested(cls, cfg)
 
     def to_dict(self, config: C, encoder: Encoder) -> Dict[str, Any]:
-        return encoder(asdict(config))
+        return encoder(asdict(config))  # type: ignore [call-overload]
 
 
 BaseConfig.register_schema(DataclassSchema(), is_dataclass)
@@ -21,7 +21,7 @@ BaseConfig.register_schema(DataclassSchema(), is_dataclass)
 def _load_nested(cls: Type[C], cfg: Dict[str, Any]) -> C:
     """Load nested dataclasses."""
     kwargs: Dict[str, Any] = {}
-    for field in fields(cls):
+    for field in fields(cls):  # type: ignore [arg-type]
         if field.name not in cfg:
             continue
         value = cfg[field.name]
