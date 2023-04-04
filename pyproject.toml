@@ -13,8 +13,7 @@ python = ">=3.8"
 
 PyYAML = { version = ">=6,<7", optional = true }
 
-tomli = { version = ">=2,<3", optional = true }
-tomli-w = { version = ">=1,<2", optional = true }
+tomlkit = { version = ">=0,<1", optional = true }
 
 pydantic = { version = ">=1,<2", optional = true }
 
@@ -22,7 +21,7 @@ attrs = { version = ">=22.2,<23", optional = true }
 
 [tool.poetry.extras]
 yaml = ["PyYAML"]
-toml = ["tomli", "tomli-w"]
+toml = ["tomlkit"]
 pydantic = ["pydantic"]
 attrs = ["attrs"]
 
