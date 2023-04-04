@@ -1,8 +1,7 @@
 import logging
-import sys
 from abc import ABC
 from functools import partial
-from typing import ClassVar, Dict, Optional
+from typing import ClassVar, Optional
 
 from zenconfig.base import ZenConfigError
 from zenconfig.encoder import Encoder, Encoders, combine_encoders, encode
@@ -45,12 +44,9 @@ class Config(ReadOnlyConfig, ABC):
 
     def clear(self) -> None:
         """Delete the config file(s)."""
-        kwargs: Dict[str, bool] = {}
-        if sys.version_info[:2] != (3, 7):
-            kwargs["missing_ok"] = True
         for path in self._paths():
             logger.debug("deleting file at path %s", path)
-            path.unlink(**kwargs)
+            path.unlink(missing_ok=True)
 
     @classmethod
     def _encoder(cls) -> Encoder:

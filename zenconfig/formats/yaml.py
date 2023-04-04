@@ -21,7 +21,11 @@ class YAMLFormat(Format):
         config: Dict[str, Any],
     ) -> None:
         path.write_text(
-            yaml.safe_dump(config, indent=self.indent, sort_keys=self.sort_keys)
+            yaml.safe_dump(
+                config,
+                indent=self.indent,
+                sort_keys=self.sort_keys,
+            ),
         )
 
 

@@ -60,9 +60,7 @@ Currently, those formats are supported:
 The format is automatically inferred from the config file extension.
 When loading from multiple files, files can be of multiple formats.
 
-Other formats can be added by subclassing `Format`.
-
-To register more formats: `Config.register_format(MyFormat(...), ".ext1", ".ext2")`.
+Other formats can be added by subclassing `Format`: `Config.register_format(MyFormat(...), ".ext1", ".ext2")`.
 
 > 💡 You can re-register a format to change dumping options.
 
@@ -71,13 +69,11 @@ Currently, those schemas are supported:
 - plain dict
 - dataclasses
 - pydantic models - requires the `pydantic` extra
-- attrs - requires the attrs extra
+- attrs - requires the `attrs` extra
 
 The schema is automatically inferred from the config class.
 
-Other schemas can be added by subclassing `Schema`.
-
-To register more schemas: `Config.register_schema(MySchema(...), lambda cls: ...)`.
+Other schemas can be added by subclassing `Schema`: `Config.register_schema(MySchema(...))`.
 
 You can also force the schema by directly overriding the `SCHEMA` class attribute on your config.
 This can be used to disable auto selection, or pass arguments to the schema instance.
@@ -91,7 +87,9 @@ For all schemas and formats, common built in types are handled [when dumping](ht
 
 > ⚠️ Keep in mind that only `attrs` and `pydantic` support casting when loading the config.
 
-You can add custom encoders with `Config.ENCODERS`. For `pydantic`, stick with [the standard way of doing it](https://pydantic-docs.helpmanual.io/usage/exporting_models/#json_encoders).
+You can add custom encoders with `Config.ENCODERS`.
+For `pydantic`, stick with [the standard way of doing it](https://pydantic-docs.helpmanual.io/usage/exporting_models/#json_encoders).
+
 
 ## Contributing
 See [contributing guide](https://github.com/gpajot/zen-config/blob/main/CONTRIBUTING.md).

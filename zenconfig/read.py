@@ -13,6 +13,7 @@ class MergeStrategy(IntEnum):
 
     SHALLOW = 1
     DEEP = 2
+    REPLACE = 3
 
 
 C = TypeVar("C", bound="ReadOnlyConfig")
@@ -39,7 +40,7 @@ class ReadOnlyConfig(BaseConfig, ABC):
                 path,
             )
             config = fmt.load(path)
-            if not dict_config:
+            if not dict_config or cls.MERGE_STRATEGY is MergeStrategy.REPLACE:
                 dict_config = config
             elif cls.MERGE_STRATEGY is MergeStrategy.SHALLOW:
                 dict_config.update(config)

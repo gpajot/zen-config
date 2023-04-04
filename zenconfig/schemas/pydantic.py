@@ -4,6 +4,7 @@ from functools import partial
 from typing import Any, Dict, Type, TypeVar
 
 from pydantic import BaseModel
+from typing_extensions import TypeGuard
 
 from zenconfig.base import BaseConfig, Schema
 from zenconfig.encoder import Encoder, encode
@@ -15,6 +16,9 @@ C = TypeVar("C", bound=BaseModel)
 class PydanticSchema(Schema[C]):
     exclude_unset: bool = False
     exclude_defaults: bool = True
+
+    def handles(self, cls: type) -> TypeGuard[Type[BaseModel]]:
+        return issubclass(cls, BaseModel)
 
     def from_dict(self, cls: Type[C], cfg: Dict[str, Any]) -> C:
         return cls.parse_obj(cfg)
@@ -29,7 +33,7 @@ class PydanticSchema(Schema[C]):
         )
 
 
-BaseConfig.register_schema(PydanticSchema(), lambda cls: issubclass(cls, BaseModel))
+BaseConfig.register_schema(PydanticSchema())
 
 
 def _encoder(config: BaseModel) -> Encoder:
