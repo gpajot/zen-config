@@ -1,6 +1,7 @@
 from typing import Any, Dict, Type, TypeVar
 
 import attrs
+from typing_extensions import TypeGuard
 
 from zenconfig.base import BaseConfig, Schema
 from zenconfig.encoder import Encoder
@@ -9,6 +10,9 @@ C = TypeVar("C", bound=attrs.AttrsInstance)
 
 
 class AttrsSchema(Schema[C]):
+    def handles(self, cls: type) -> TypeGuard[Type[attrs.AttrsInstance]]:
+        return attrs.has(cls)
+
     def from_dict(self, cls: Type[C], cfg: Dict[str, Any]) -> C:
         return _load_nested(cls, cfg)
 
@@ -16,7 +20,7 @@ class AttrsSchema(Schema[C]):
         return encoder(attrs.asdict(config))
 
 
-BaseConfig.register_schema(AttrsSchema(), attrs.has)
+BaseConfig.register_schema(AttrsSchema())
 
 
 def _load_nested(cls: Type[C], cfg: Dict[str, Any]) -> C:

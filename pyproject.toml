@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "zenconfig"
-version = "1.7.0"
+version = "2.0.0"
 description = "Simple configuration loader for python."
 authors = ["Gabriel Pajot <gab@les-cactus.co>"]
 license = "MIT"

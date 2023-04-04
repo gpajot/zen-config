@@ -3,7 +3,6 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import (
     Any,
-    Callable,
     ClassVar,
     Dict,
     Generic,
@@ -45,6 +44,10 @@ class Schema(ABC, Generic[C]):
     """Abstract class for handling different config class types."""
 
     @abstractmethod
+    def handles(self, cls: type) -> bool:
+        """Return if a type is handled by this schema."""
+
+    @abstractmethod
     def from_dict(self, cls: Type[C], cfg: Dict[str, Any]) -> C:
         """Load the schema based on a dict configuration."""
 
@@ -71,7 +74,7 @@ class BaseConfig(ABC):
     # All formats supported, by extension.
     __FORMATS: ClassVar[Dict[str, Format]] = {}
     # All schema classes supported.
-    __SCHEMAS: ClassVar[List[Tuple[Schema, Callable[[type], bool]]]] = []
+    __SCHEMAS: ClassVar[List[Schema]] = []
 
     @classmethod
     def register_format(cls, fmt: Format, *extensions: str) -> None:
@@ -80,13 +83,9 @@ class BaseConfig(ABC):
             cls.__FORMATS[ext] = fmt
 
     @classmethod
-    def register_schema(
-        cls,
-        schema: Schema,
-        handles: Callable[[type], bool],
-    ) -> None:
+    def register_schema(cls, schema: Schema[C]) -> None:
         """Add a schema class to the list of supported ones."""
-        cls.__SCHEMAS.append((schema, handles))
+        cls.__SCHEMAS.append(schema)
 
     @classmethod
     def _paths(cls) -> Tuple[Path, ...]:
@@ -130,8 +129,8 @@ class BaseConfig(ABC):
         """Get the schema instance for this config class."""
         if cls.SCHEMA:
             return cls.SCHEMA
-        for schema, handles in cls.__SCHEMAS:
-            if not handles(cls):
+        for schema in cls.__SCHEMAS:
+            if not schema.handles(cls):
                 continue
             cls.SCHEMA = schema
             return cls.SCHEMA
