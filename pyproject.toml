@@ -28,7 +28,7 @@ attrs = ["attrs"]
 [tool.poetry.group.test.dependencies]
 pytest = "==7.3.2"
 pytest-mock = "==3.11.1"
-ruff = "==0.0.273"
+ruff = "==0.0.275"
 mypy = "==1.4.0"
 black = "==23.3.0"
 pre-commit = "==3.3.3"
