@@ -2,7 +2,7 @@ from typing import ClassVar
 
 from pydantic import BaseModel
 
-from tests.schemas.utils import AnEnum, encoders, parametrize_formats
+from tests.schemas.utils import AnEnum, parametrize_formats
 from zenconfig.schemas.pydantic import PydanticSchema
 from zenconfig.write import Config
 
@@ -21,9 +21,6 @@ class DeepPydanticConfig(BaseModel):
 def test_pydantic(fmt, path):
     class PydanticConfig(Config, BaseModel):
         PATH: ClassVar[str] = path
-
-        class Config:
-            json_encoders = encoders
 
         a: str
         b: int
@@ -45,5 +42,5 @@ def test_pydantic(fmt, path):
     assert reloaded.b == 1
     assert reloaded.deep.c is False
     assert reloaded.deep.deeper.d is True
-    assert reloaded.deep.deeper.e is AnEnum.TWO
+    assert reloaded.deep.deeper.e is AnEnum.ONE
     cfg.clear()

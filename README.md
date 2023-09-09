@@ -88,7 +88,7 @@ For all schemas and formats, common built in types are handled [when dumping](ht
 > ⚠️ Keep in mind that only `attrs` and `pydantic` support casting when loading the config.
 
 You can add custom encoders with `Config.ENCODERS`.
-For `pydantic`, stick with [the standard way of doing it](https://pydantic-docs.helpmanual.io/usage/exporting_models/#json_encoders).
+For `pydantic`, stick with [the standard way of doing it](https://docs.pydantic.dev/latest/usage/serialization/#custom-serializers).
 
 
 ## Contributing

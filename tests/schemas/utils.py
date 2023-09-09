@@ -1,4 +1,4 @@
-from enum import Enum
+from enum import IntEnum
 
 import pytest
 
@@ -17,7 +17,7 @@ parametrize_formats = pytest.mark.parametrize(
 )
 
 
-class AnEnum(Enum):
+class AnEnum(IntEnum):
     ONE = 1
     TWO = 2
 
