@@ -1,6 +1,6 @@
 # zen-config
 
-[![tests](https://github.com/gpajot/zen-config/workflows/Test/badge.svg?branch=main&event=push)](https://github.com/gpajot/zen-config/actions?query=workflow%3ATest+branch%3Amain+event%3Apush)
+[![tests](https://github.com/gpajot/zen-config/actions/workflows/test.yml/badge.svg?branch=main&event=push)](https://github.com/gpajot/zen-config/actions/workflows/test.yml?query=branch%3Amain+event%3Apush)
 [![version](https://img.shields.io/pypi/v/zenconfig?label=stable)](https://pypi.org/project/zenconfig/)
 [![python](https://img.shields.io/pypi/pyversions/zenconfig)](https://pypi.org/project/zenconfig/)
 
