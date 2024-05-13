@@ -56,7 +56,7 @@ class Schema(ABC, Generic[C]):
         """Dump the config to dict."""
 
 
-class BaseConfig(ABC):
+class BaseConfig:
     """Abstract base class for handling config files."""
 
     # Environment variable name holding the config file path to load.
