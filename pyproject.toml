@@ -27,7 +27,7 @@ pydantic = ["pydantic"]
 attrs = ["attrs"]
 
 [tool.poetry.group.test.dependencies]
-pytest = "==8.2.0"
+pytest = "==8.2.1"
 pytest-mock = "==3.14.0"
 ruff = "==0.4.4"
 mypy = "==1.10.0"
