@@ -7,15 +7,15 @@ from zenconfig.base import BaseConfig, Format, Schema, ZenConfigError
 
 
 class TestBaseConfig:
-    @pytest.fixture()
+    @pytest.fixture
     def fmt(self, mocker):
         return mocker.Mock(spec=Format)
 
-    @pytest.fixture()
+    @pytest.fixture
     def schema(self, mocker):
         return mocker.Mock(spec=Schema)
 
-    @pytest.fixture()
+    @pytest.fixture
     def config(self, fmt, schema):
         class Config(BaseConfig):
             FORMAT = fmt
