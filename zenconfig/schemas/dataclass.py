@@ -42,7 +42,7 @@ def _load_nested(cls: Type[C], cfg: Dict[str, Any]) -> C:
         if field.name not in cfg:
             continue
         value = cfg[field.name]
-        if is_dataclass(field.type):
+        if is_dataclass(field.type) and isinstance(field.type, type):
             value = _load_nested(field.type, value)
         kwargs[field.name] = value
     return cls(**kwargs)
