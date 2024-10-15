@@ -9,7 +9,7 @@ repository = "https://github.com/gpajot/zen-config"
 include = ["zenconfig/py.typed"]
 
 [tool.poetry.dependencies]
-python = ">=3.8"
+python = ">=3.9"
 typing-extensions = ">=4.10"
 
 PyYAML = { version = ">=6,<7", optional = true }
