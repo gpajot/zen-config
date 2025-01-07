@@ -1,7 +1,7 @@
 # zen-config
 
 [![tests](https://github.com/gpajot/zen-config/actions/workflows/test.yml/badge.svg?branch=main&event=push)](https://github.com/gpajot/zen-config/actions/workflows/test.yml?query=branch%3Amain+event%3Apush)
-[![version](https://img.shields.io/pypi/v/zenconfig?label=stable)](https://pypi.org/project/zenconfig/)
+[![PyPi](https://img.shields.io/pypi/v/zenconfig?label=stable)](https://pypi.org/project/zenconfig/)
 [![python](https://img.shields.io/pypi/pyversions/zenconfig)](https://pypi.org/project/zenconfig/)
 
 Simple configuration loader for python.
@@ -39,7 +39,8 @@ When creating your config, you can specify at least one of those two attributes:
 - `ENV_PATH` the environment variable name containing the path to the config file, defaults to `CONFIG`
 - `PATH` directly the config path
 
-> 💡 When supplying both, if the env var is not set, it will use `PATH`.
+> [!TIP]
+> When supplying both, if the env var is not set, it will use `PATH`.
 
 User constructs will be expanded.
 If the file does not exist it will be created.
@@ -62,7 +63,8 @@ When loading from multiple files, files can be of multiple formats.
 
 Other formats can be added by subclassing `Format`: `Config.register_format(MyFormat(...), ".ext1", ".ext2")`.
 
-> 💡 You can re-register a format to change dumping options.
+> [!TIP]
+> You can re-register a format to change dumping options.
 
 ## Supported schemas
 Currently, those schemas are supported:
@@ -78,14 +80,16 @@ Other schemas can be added by subclassing `Schema`: `Config.register_schema(MySc
 You can also force the schema by directly overriding the `SCHEMA` class attribute on your config.
 This can be used to disable auto selection, or pass arguments to the schema instance.
 
-> ⚠️ When using pydantic, you have to supply the `ClassVar` type annotations
+> [!WARNING]
+> When using pydantic, you have to supply the `ClassVar` type annotations
 > to all class variable you override
 > otherwise pydantic will treat those as its own fields and complain.
 
 ### Conversions
 For all schemas and formats, common built in types are handled [when dumping](https://github.com/gpajot/zen-config/blob/main/zenconfig/encoder.py).
 
-> ⚠️ Keep in mind that only `attrs` and `pydantic` support casting when loading the config.
+> [!IMPORTANT]
+> Keep in mind that only `attrs` and `pydantic` support casting when loading the config.
 
 You can add custom encoders with `Config.ENCODERS`.
 For `pydantic`, stick with [the standard way of doing it](https://docs.pydantic.dev/latest/usage/serialization/#custom-serializers).
