@@ -1,10 +1,10 @@
 [project]
 name = "zenconfig"
-version = "2.1.1"
+version = "2.2.0"
 description = "Simple configuration loader for python."
 license = "MIT"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 authors = [
     { name = "Gabriel Pajot", email = "gab@lescactus.eu" },
 ]
@@ -51,5 +51,5 @@ warn_untyped_fields = true
 build-backend = { module-name = "zenconfig", module-root = "" }
 
 [build-system]
-requires = ["uv_build>=0.8.15,<0.9"]
+requires = ["uv_build>=0.9.3,<0.10"]
 build-backend = "uv_build"
