@@ -1,5 +1,10 @@
 # zen-config
 
+> [!WARNING]
+> This repository has been archived since it can now be completely replaced with
+> [Pydantic Settings Management](https://docs.pydantic.dev/latest/concepts/pydantic_settings/).
+> See [setting sources](https://docs.pydantic.dev/latest/concepts/pydantic_settings/#other-settings-source) for YAML, JSON and TOML parsing.
+
 [![tests](https://github.com/gpajot/zen-config/actions/workflows/test.yml/badge.svg?branch=main&event=push)](https://github.com/gpajot/zen-config/actions/workflows/test.yml?query=branch%3Amain+event%3Apush)
 [![PyPi](https://img.shields.io/pypi/v/zenconfig?label=stable)](https://pypi.org/project/zenconfig/)
 [![python](https://img.shields.io/pypi/pyversions/zenconfig)](https://pypi.org/project/zenconfig/)
